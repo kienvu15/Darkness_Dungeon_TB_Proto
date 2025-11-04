@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private Player player;
     private CharacterController characterController;
     private PlayerControls controls;
     private Animator animator;
@@ -22,18 +23,14 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 moveInput;
     private Vector2 aimInput;
 
-    private void Awake()
-    {
-        AssignInputEvents();
-    }
-
-
     private void Start()
     {
         characterController = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
+        player = GetComponent<Player>();
 
         speed = walkSpeed;
+        AssignInputEvents();
     }
 
 
@@ -44,11 +41,7 @@ public class PlayerMovement : MonoBehaviour
         AnimatorControllers();
     }
 
-    private void Shoot()
-    {
-        Debug.Log("FIRE!");
-        animator.SetTrigger("Fire");
-    }
+
 
     private void AnimatorControllers()
     {
@@ -72,7 +65,7 @@ public class PlayerMovement : MonoBehaviour
 
             transform.forward = lookingDirection;
 
-            aim.position = new Vector3 (hitInfo.point.x, transform.position.y , hitInfo.point.z);
+            aim.position = new Vector3 (hitInfo.point.x, transform.position.y + 1 , hitInfo.point.z);
         }
     }
 
@@ -99,12 +92,10 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-    #region New Input System
     private void AssignInputEvents()
     {
-        controls = new PlayerControls();
+        controls = player.controls;
 
-        controls.Character.Fire.performed += context => Shoot();
 
         controls.Character.Movement.performed += context => moveInput = context.ReadValue<Vector2>();
         controls.Character.Movement.canceled += context => moveInput = Vector2.zero;
@@ -128,13 +119,6 @@ public class PlayerMovement : MonoBehaviour
             isRunning = false;
         };
     }
-    private void OnEnable()
-    {
-        controls.Enable();
-    }
-    private void OnDisable()
-    {
-        controls.Disable();
-    }
-    #endregion
+    
+    
 }
